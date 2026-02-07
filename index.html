@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meme Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="header-title">Meme Generator</h1>
+      <p class="header-tagline">Upload, caption, download.</p>
+    </header>
+
+    <section class="image-section" aria-label="Image source">
+      <div class="image-source-row">
+        <label class="file-label" for="imageInput">
+          <span class="file-label-icon" aria-hidden="true">↑</span>
+          <span class="file-label-text">Upload your own</span>
+        </label>
+        <span class="image-source-divider" aria-hidden="true">or pick a template</span>
+      </div>
+      <input type="file" id="imageInput" accept="image/*" hidden>
+      <div class="template-thumbs" id="templateThumbs" aria-label="Template images"></div>
+    </section>
+
+    <main class="main-content">
+      <aside class="controls">
+        <div class="text-blocks-panel card">
+          <h2 class="panel-title">Text blocks</h2>
+          <button type="button" id="addBlockBtn" class="add-block-btn">+ Add text block</button>
+          <div id="blocksList" class="blocks-list"></div>
+        </div>
+        <button type="button" id="downloadBtn" class="download-btn" disabled>
+          <span class="download-btn-icon" aria-hidden="true">↓</span>
+          Download meme
+        </button>
+      </aside>
+      <div class="canvas-wrap card">
+        <canvas id="memeCanvas" aria-label="Meme preview"></canvas>
+        <p id="noImageHint" class="no-image-hint">Load an image to get started</p>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

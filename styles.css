@@ -1,0 +1,391 @@
+/* Meme Generator – Redesign
+   Warm dark theme, coral accent (no purple/blue per project rules) */
+
+:root {
+  --bg: #0f0e0d;
+  --surface: #1a1816;
+  --surface-raised: #242220;
+  --border: #2d2a28;
+  --border-focus: #e85d4c;
+  --text: #f5f3f0;
+  --text-muted: #9c9893;
+  --accent: #e85d4c;
+  --accent-hover: #ef7a6b;
+  --accent-muted: rgba(232, 93, 76, 0.15);
+  --success: #22c55e;
+  --success-hover: #16a34a;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Bebas Neue", sans-serif;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --transition: 0.2s ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.header-tagline {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Image section */
+.image-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.image-source-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.image-source-divider {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.file-label:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.file-label-icon {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.template-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.template-thumbs img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.template-thumbs img:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.template-thumbs img.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Main layout */
+.main-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+/* Controls sidebar */
+.controls {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.add-block-btn {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.add-block-btn:hover {
+  background: var(--accent-hover);
+}
+
+.blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.block-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem;
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.block-row.selected {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.block-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.block-row input[type="text"],
+.block-row textarea.block-text {
+  padding: 0.5rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--transition);
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+.block-row textarea.block-text {
+  resize: vertical;
+  min-height: 2.8rem;
+}
+
+.block-row input[type="text"]::placeholder,
+.block-row textarea.block-text::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.block-row input[type="text"]:focus,
+.block-row textarea.block-text:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.block-row .size-row,
+.block-row .color-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.block-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 6px;
+}
+
+.block-row .size-value {
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.block-row input[type="color"] {
+  width: 2.5rem;
+  height: 2rem;
+  padding: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.block-row .color-value {
+  font-size: 0.75rem;
+  min-width: 4rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, monospace;
+}
+
+.block-row .delete-block {
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background var(--transition), color var(--transition);
+}
+
+.block-row .delete-block:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.download-btn:hover:not(:disabled) {
+  background: var(--success-hover);
+}
+
+.download-btn:disabled {
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.download-btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Canvas area */
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 320px;
+}
+
+#memeCanvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+}
+
+.no-image-hint {
+  position: absolute;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.no-image-hint.hidden {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .controls {
+    flex: 1 1 100%;
+  }
+
+  .main-content {
+    flex-direction: column;
+  }
+
+  .canvas-wrap {
+    min-height: 280px;
+  }
+}

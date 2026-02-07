@@ -1,0 +1,17 @@
+HOW TO START THE LOCAL SERVER (from Cursor)
+
+Steps:
+1. Open Cursor with this project folder.
+2. Open the terminal: press Ctrl+` (backtick, key above Tab).
+3. Run: .\start-server.bat
+4. In your browser, go to: http://localhost:8080
+5. To stop the server: click in the terminal, then press Ctrl+C
+
+Tips (so you don't make the same mistakes):
+- The file name has a HYPHEN: start-server.bat (not startserver.bat).
+- Do NOT type "bash" before the command. Run the batch file directly.
+- In PowerShell use a backslash: .\start-server.bat (not a forward slash).
+
+Alternative (if you prefer):
+- python -m http.server 8080 --bind 127.0.0.1
+Then open http://localhost:8080 and stop with Ctrl+C in the terminal.
