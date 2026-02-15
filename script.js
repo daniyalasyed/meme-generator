@@ -14,6 +14,8 @@
   const blocksList = document.getElementById('blocksList');
   const downloadBtn = document.getElementById('downloadBtn');
   const noImageHint = document.getElementById('noImageHint');
+  const textAdderBar = document.getElementById('textAdderBar');
+  const textBlocksPane = document.getElementById('textBlocksPane');
 
   const TEMPLATES = [
     { path: 'assets/Drake Hotline Bling Meme - Blank Template.jpg', name: 'Drake Hotline Bling' },
@@ -29,6 +31,16 @@
   let draggingBlock = null;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
+
+  function updateUiState() {
+    const hasImage = Boolean(backgroundImage);
+    const hasBlocks = blocks.length > 0;
+    noImageHint.classList.toggle('hidden', hasImage);
+    textAdderBar.hidden = !hasImage;
+    textBlocksPane.hidden = !hasBlocks;
+    downloadBtn.hidden = !hasImage;
+    downloadBtn.disabled = !hasImage;
+  }
 
   function getCanvasCoords(e) {
     const rect = canvas.getBoundingClientRect();
@@ -169,6 +181,8 @@
     let urlToRevoke = null;
     img.onload = function () {
       if (urlToRevoke) URL.revokeObjectURL(urlToRevoke);
+      const prevWidth = canvasWidth;
+      const prevHeight = canvasHeight;
       backgroundImage = img;
       let w = img.width;
       let h = img.height;
@@ -177,9 +191,16 @@
         w = Math.round(w * scale);
         h = Math.round(h * scale);
       }
+      if (blocks.length > 0 && prevWidth > 0 && prevHeight > 0) {
+        const scaleX = w / prevWidth;
+        const scaleY = h / prevHeight;
+        blocks.forEach(function (block) {
+          block.x = Math.round(block.x * scaleX);
+          block.y = Math.round(block.y * scaleY);
+        });
+      }
       setCanvasSize(w, h);
-      noImageHint.classList.add('hidden');
-      downloadBtn.disabled = false;
+      updateUiState();
     };
     img.onerror = function () {
       console.error('Failed to load image');
@@ -193,6 +214,7 @@
   }
 
   function addBlock() {
+    if (!backgroundImage) return;
     const block = createBlock({
       x: canvasWidth / 2,
       y: canvasHeight / 2,
@@ -200,6 +222,10 @@
     });
     blocks.push(block);
     renderBlockRow(block);
+    blocksList.querySelectorAll('.block-row').forEach(r => r.classList.remove('selected'));
+    const createdRow = document.querySelector(`.block-row[data-block-id="${block.id}"]`);
+    if (createdRow) createdRow.classList.add('selected');
+    updateUiState();
     draw();
   }
 
@@ -210,6 +236,7 @@
     if (draggingBlock && draggingBlock.id === id) {
       draggingBlock = null;
     }
+    updateUiState();
     draw();
   }
 
@@ -329,21 +356,25 @@
   function renderTemplates() {
     templateThumbs.innerHTML = '';
     TEMPLATES.forEach(function (t) {
-      const thumb = document.createElement('img');
-      thumb.src = t.path;
-      thumb.alt = t.name;
-      thumb.title = t.name;
-      thumb.setAttribute('role', 'button');
-      thumb.addEventListener('click', function () {
+      const templateBtn = document.createElement('button');
+      templateBtn.type = 'button';
+      templateBtn.className = 'template-thumb';
+      templateBtn.title = t.name;
+      templateBtn.innerHTML = `
+        <img src="${t.path}" alt="${escapeHtml(t.name)}">
+        <span class="template-name">${escapeHtml(t.name)}</span>
+      `;
+      templateBtn.addEventListener('click', function () {
         loadImage(t.path);
-        templateThumbs.querySelectorAll('img').forEach(function (img) { img.classList.remove('selected'); });
-        thumb.classList.add('selected');
+        templateThumbs.querySelectorAll('.template-thumb').forEach(function (btn) { btn.classList.remove('selected'); });
+        templateBtn.classList.add('selected');
         imageInput.value = '';
       });
-      thumb.addEventListener('error', function () {
-        thumb.alt = 'Failed to load';
+      const thumbImg = templateBtn.querySelector('img');
+      thumbImg.addEventListener('error', function () {
+        thumbImg.alt = 'Failed to load';
       });
-      templateThumbs.appendChild(thumb);
+      templateThumbs.appendChild(templateBtn);
     });
   }
 
@@ -351,7 +382,7 @@
     const file = this.files?.[0];
     if (file) {
       loadImage(file);
-      templateThumbs.querySelectorAll('img').forEach(function (img) { img.classList.remove('selected'); });
+      templateThumbs.querySelectorAll('.template-thumb').forEach(function (btn) { btn.classList.remove('selected'); });
     }
   });
 
@@ -359,10 +390,12 @@
 
   addBlockBtn.addEventListener('click', addBlock);
   downloadBtn.addEventListener('click', downloadMeme);
+  downloadBtn.hidden = true;
   downloadBtn.disabled = true;
 
   initCanvasDrag();
 
   setCanvasSize(canvasWidth, canvasHeight);
+  updateUiState();
   draw();
 })();

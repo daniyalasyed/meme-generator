@@ -13,37 +13,51 @@
   <div class="app">
     <header class="header">
       <h1 class="header-title">Meme Generator</h1>
-      <p class="header-tagline">Upload, caption, download.</p>
+      <p class="header-tagline">Choose a template or upload your own, then design and download.</p>
     </header>
-
-    <section class="image-section" aria-label="Image source">
-      <div class="image-source-row">
-        <label class="file-label" for="imageInput">
+    <main class="workspace">
+      <aside class="left-pane card" aria-label="Template selector">
+        <h2 class="panel-title">Meme templates</h2>
+        <label class="file-label full-width" for="imageInput">
           <span class="file-label-icon" aria-hidden="true">↑</span>
-          <span class="file-label-text">Upload your own</span>
+          <span class="file-label-text">Upload your own image</span>
         </label>
-        <span class="image-source-divider" aria-hidden="true">or pick a template</span>
-      </div>
-      <input type="file" id="imageInput" accept="image/*" hidden>
-      <div class="template-thumbs" id="templateThumbs" aria-label="Template images"></div>
-    </section>
-
-    <main class="main-content">
-      <aside class="controls">
-        <div class="text-blocks-panel card">
-          <h2 class="panel-title">Text blocks</h2>
-          <button type="button" id="addBlockBtn" class="add-block-btn">+ Add text block</button>
-          <div id="blocksList" class="blocks-list"></div>
-        </div>
-        <button type="button" id="downloadBtn" class="download-btn" disabled>
-          <span class="download-btn-icon" aria-hidden="true">↓</span>
-          Download meme
-        </button>
+        <input type="file" id="imageInput" accept="image/*" hidden>
+        <p class="pane-help">Or choose a ready-made template below:</p>
+        <div class="template-thumbs" id="templateThumbs" aria-label="Template images"></div>
       </aside>
-      <div class="canvas-wrap card">
-        <canvas id="memeCanvas" aria-label="Meme preview"></canvas>
-        <p id="noImageHint" class="no-image-hint">Load an image to get started</p>
-      </div>
+
+      <section class="center-pane">
+        <div class="canvas-card card">
+          <div class="canvas-toolbar">
+            <p class="canvas-title">Workspace</p>
+            <button type="button" id="downloadBtn" class="download-btn" hidden disabled>
+              <span class="download-btn-icon" aria-hidden="true">↓</span>
+              Download meme
+            </button>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="memeCanvas" aria-label="Meme preview"></canvas>
+            <p id="noImageHint" class="no-image-hint">Upload an image or select a template to begin</p>
+          </div>
+        </div>
+
+        <div id="textAdderBar" class="text-adder card" hidden>
+          <div class="text-adder-content">
+            <div>
+              <p class="text-adder-title">Text tools</p>
+              <p class="text-adder-help">Add draggable text blocks and style them from the right panel.</p>
+            </div>
+            <button type="button" id="addBlockBtn" class="add-block-btn">+ Add text block</button>
+          </div>
+        </div>
+      </section>
+
+      <aside id="textBlocksPane" class="right-pane card" aria-label="Text block editor" hidden>
+        <h2 class="panel-title">Text blocks</h2>
+        <p class="pane-help">Select a block to edit content, size, and color.</p>
+        <div id="blocksList" class="blocks-list"></div>
+      </aside>
     </main>
   </div>
   <script src="script.js"></script>
