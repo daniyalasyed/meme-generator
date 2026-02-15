@@ -113,7 +113,7 @@
     return null;
   }
 
-  function drawBlock(block, selected) {
+  function drawBlock(block, selected, showSelection) {
     const lines = wrapBlockText(block);
     const font = `bold ${block.fontSize}px "Impact", "Arial Black", sans-serif`;
     ctx.font = font;
@@ -131,7 +131,7 @@
       ctx.fillText(line, block.x, y);
       y += lineHeight;
     });
-    if (selected) {
+    if (selected && showSelection) {
       const b = getBlockBounds(block);
       ctx.strokeStyle = 'rgba(232, 93, 76, 0.9)';
       ctx.lineWidth = 2;
@@ -141,7 +141,7 @@
     }
   }
 
-  function draw() {
+  function draw(showSelection = true) {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (backgroundImage) {
@@ -151,7 +151,7 @@
     const selectedId = document.querySelector('.block-row.selected')?.dataset?.blockId;
     const selected = selectedId ? blocks.find(b => String(b.id) === selectedId) : null;
     blocks.forEach(function (block) {
-      drawBlock(block, block === selected);
+      drawBlock(block, block === selected, showSelection);
     });
   }
 
@@ -317,11 +317,13 @@
 
   function downloadMeme() {
     if (!backgroundImage) return;
+    draw(false);
     const data = canvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = data;
     a.download = 'meme.png';
     a.click();
+    draw(true);
   }
 
   function renderTemplates() {
