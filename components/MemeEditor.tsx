@@ -43,6 +43,7 @@ export function MemeEditor({ canPost, isPosting, onPost, templates, templatesLoa
   const [selectedBlockId, setSelectedBlockId] = useState<number | null>(null);
   const [caption, setCaption] = useState("");
   const [selectedTemplatePath, setSelectedTemplatePath] = useState("");
+  const [templateLoadError, setTemplateLoadError] = useState("");
 
   const dragRef = useRef<{
     blockId: number | null;
@@ -60,6 +61,13 @@ export function MemeEditor({ canPost, isPosting, onPost, templates, templatesLoa
     () => blocks.find((block) => block.id === selectedBlockId) ?? null,
     [blocks, selectedBlockId]
   );
+
+  function resolveTemplateSrc(path: string) {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return `/api/template-image?src=${encodeURIComponent(path)}`;
+    }
+    return path;
+  }
 
   function getCanvasContext() {
     const canvas = canvasRef.current;
@@ -394,15 +402,43 @@ export function MemeEditor({ canPost, isPosting, onPost, templates, templatesLoa
               className={`template-thumb ${selectedTemplatePath === template.path ? "selected" : ""}`}
               title={template.name}
               onClick={async () => {
-                await loadImage(template.path);
-                setSelectedTemplatePath(template.path);
+                const resolvedTemplateSrc = resolveTemplateSrc(template.path);
+                try {
+                  setTemplateLoadError("");
+                  await loadImage(resolvedTemplateSrc);
+                  setSelectedTemplatePath(template.path);
+                } catch {
+                  const userFacingMessage =
+                    "Could not load this template image. Try again in a few seconds, or choose a different template.";
+                  setTemplateLoadError(userFacingMessage);
+                  window.alert(
+                    "Could not load this template image.\n\n" +
+                    "This can happen if:\n" +
+                    "• The image was just uploaded and is still processing\n" +
+                    "• There's a temporary network issue\n\n" +
+                    "Try again in a few seconds, or choose a different template."
+                  );
+                }
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={template.path} alt={template.name} />
+              <img src={resolveTemplateSrc(template.path)} alt={template.name} />
             </button>
           ))}
         </div>
+        {templateLoadError && (
+          <p
+            role="alert"
+            style={{
+              marginTop: "0.75rem",
+              color: "var(--danger)",
+              fontSize: "0.75rem",
+              lineHeight: 1.4
+            }}
+          >
+            {templateLoadError}
+          </p>
+        )}
         <label className="upload-btn" htmlFor="imageInput">
           <svg
             width="16"
