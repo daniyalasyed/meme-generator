@@ -2,8 +2,9 @@
 
 import { id } from "@instantdb/react";
 import { db } from "@/lib/instant";
+import { ADMIN_EMAIL } from "@/lib/constants";
 
-export const ADMIN_EMAIL = "daniyalasyed1@gmail.com";
+export { ADMIN_EMAIL };
 
 export type TemplateRecord = {
   id: string;
