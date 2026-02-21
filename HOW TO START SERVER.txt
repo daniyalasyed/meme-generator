@@ -1,17 +1,23 @@
-HOW TO START THE LOCAL SERVER (from Cursor)
+HOW TO START THE LOCAL SERVER (Next.js app)
 
-Steps:
+FIRST TIME ONLY:
 1. Open Cursor with this project folder.
 2. Open the terminal: press Ctrl+` (backtick, key above Tab).
-3. Run: .\start-server.bat
-4. In your browser, go to: http://localhost:8080
-5. To stop the server: click in the terminal, then press Ctrl+C
+3. Run: npm install
 
-Tips (so you don't make the same mistakes):
-- The file name has a HYPHEN: start-server.bat (not startserver.bat).
-- Do NOT type "bash" before the command. Run the batch file directly.
-- In PowerShell use a backslash: .\start-server.bat (not a forward slash).
+EVERY TIME YOU WORK:
+1. Open the terminal: press Ctrl+`.
+2. Run: npm.cmd run dev
+   (If npm works normally in your shell, npm run dev is fine too.)
+3. Open in browser: http://localhost:3000
+4. To stop the server: click in terminal, then press Ctrl+C
 
-Alternative (if you prefer):
-- python -m http.server 8080 --bind 127.0.0.1
-Then open http://localhost:8080 and stop with Ctrl+C in the terminal.
+IF POWERSHELL SHOWS "RUNNING SCRIPTS IS DISABLED":
+- Quick fix (recommended): use npm.cmd run dev
+- Optional permanent fix:
+  Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+  Then restart terminal and run npm run dev
+
+IMPORTANT:
+- This project now uses Next.js.
+- Old static app files (index.html, script.js, styles.css, start-server.bat) are legacy and are not used by the new app server.

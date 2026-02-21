@@ -13,4 +13,16 @@ desktop.ini
 npm-debug.log*
 
 # Optional: uncomment if you add Node later
-# node_modules/
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# TypeScript / tooling
+*.tsbuildinfo
