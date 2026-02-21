@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { db } from "@/lib/instant";
+import { isAdmin } from "@/lib/templates";
 
 export function NavBar() {
   const pathname = usePathname();
@@ -33,6 +34,14 @@ export function NavBar() {
         >
           Feed
         </Link>
+        {isAdmin(user?.email) && (
+          <Link
+            href="/admin"
+            className={`nav-tab ${isActive("/admin") ? "active" : ""}`}
+          >
+            Admin
+          </Link>
+        )}
       </div>
 
       <div className="nav-auth">

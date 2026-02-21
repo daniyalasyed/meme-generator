@@ -11,11 +11,10 @@ const HIT_PADDING = 8;
 const LINE_HEIGHT_RATIO = 1.15;
 const MAX_TEXT_WIDTH_PAD = 40;
 
-const TEMPLATES = [
-  { path: "/templates/drake.jpg", name: "Drake Hotline Bling" },
-  { path: "/templates/thinking.jpg", name: "I Bet He's Thinking About Other Women" },
-  { path: "/templates/two-buttons.jpg", name: "Two Buttons" }
-];
+export type Template = {
+  path: string;
+  name: string;
+};
 
 type TextBlock = {
   id: number;
@@ -31,9 +30,11 @@ type MemeEditorProps = {
   canPost: boolean;
   isPosting: boolean;
   onPost: (params: { blob: Blob; caption: string }) => Promise<void>;
+  templates: Template[];
+  templatesLoading?: boolean;
 };
 
-export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
+export function MemeEditor({ canPost, isPosting, onPost, templates, templatesLoading }: MemeEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const [canvasSize, setCanvasSize] = useState({ width: CANVAS_MAX, height: CANVAS_MAX });
@@ -378,7 +379,15 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
       <aside className="templates-sidebar" aria-label="Template selector">
         <h2 className="sidebar-title">Choose a template</h2>
         <div className="template-thumbs" aria-label="Template images">
-          {TEMPLATES.map((template) => (
+          {templatesLoading ? (
+            <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", gridColumn: "1 / -1" }}>
+              Loading...
+            </p>
+          ) : templates.length === 0 ? (
+            <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", gridColumn: "1 / -1" }}>
+              No templates
+            </p>
+          ) : templates.map((template) => (
             <button
               key={template.path}
               type="button"
