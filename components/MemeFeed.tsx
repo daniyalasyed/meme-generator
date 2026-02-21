@@ -76,18 +76,20 @@ export function MemeFeed({ memes, votes, currentUserId }: MemeFeedProps) {
                   alt={meme.caption || "Posted meme"}
                 />
                 <div className="feed-meta">
-                  <p className="feed-caption">{meme.caption || "Untitled meme"}</p>
-                  <p className="feed-author">{meme.authorName || "Anonymous"}</p>
-                  <p className="feed-time">{formatRelative(meme.createdAt)}</p>
+                  <div className="feed-info">
+                    <p className="feed-author">{meme.authorName || "Anonymous"}</p>
+                    <span className="feed-dot">·</span>
+                    <p className="feed-time">{formatRelative(meme.createdAt)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={`vote-btn ${liked ? "active" : ""}`}
+                    onClick={() => handleVote(meme.id)}
+                    disabled={!currentUserId || busyMemeId === meme.id}
+                  >
+                    ▲ {voteCount}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className={`vote-btn ${liked ? "active" : ""}`}
-                  onClick={() => handleVote(meme.id)}
-                  disabled={!currentUserId || busyMemeId === meme.id}
-                >
-                  ▲ {voteCount}
-                </button>
               </article>
             );
           })}

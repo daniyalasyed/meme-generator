@@ -664,45 +664,59 @@ a {
 }
 
 .feed-list {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
 }
 
 .feed-item {
-  display: grid;
-  grid-template-columns: 180px 1fr auto;
-  gap: 1rem;
-  align-items: center;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .feed-image {
   width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
+  max-height: 400px;
+  object-fit: contain;
+  background: var(--bg);
 }
 
 .feed-meta {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
 }
 
-.feed-caption {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+.feed-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feed-dot {
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
 .feed-author,
 .feed-time {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+}
+
+.feed-author {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .vote-btn {
@@ -930,12 +944,24 @@ a {
   }
 
   .feed-item {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    max-width: 100%;
   }
 
   .feed-image {
-    height: 200px;
+    max-height: 350px;
+  }
+
+  .feed-meta {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .feed-info {
+    gap: 0.35rem;
+  }
+
+  .feed-author,
+  .feed-time {
+    font-size: 0.8rem;
   }
 
   .auth-back-btn {
