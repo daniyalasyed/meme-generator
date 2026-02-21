@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { MemeFeed } from "@/components/MemeFeed";
 import { db } from "@/lib/instant";
 import { FEED_QUERY, MemeRecord, VoteRecord } from "@/lib/memes";
@@ -12,16 +11,9 @@ export default function FeedPage() {
   const votes = ((data?.votes as VoteRecord[]) ?? []);
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1 className="header-title">Community Feed</h1>
-        <p className="header-tagline">View the latest memes and vote in real time.</p>
-      </header>
-
-      <div className="top-row">
-        <Link className="card nav-card" href="/">
-          Back to editor
-        </Link>
+    <div className="app feed-page">
+      <div className="feed-page-header">
+        <h1 className="feed-page-title">Meme Feed</h1>
       </div>
 
       {isLoading ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { assertRateLimit } from "@/lib/guardrails";
 import { getUserVoteSet, getVoteCountMap, MemeRecord, toggleVote, toSortedFeed, VoteRecord } from "@/lib/memes";
@@ -37,13 +38,30 @@ export function MemeFeed({ memes, votes, currentUserId }: MemeFeedProps) {
   }
 
   return (
-    <section className="card feed-card">
-      <div className="feed-header">
-        <h2 className="panel-title">Community feed</h2>
-        <p className="pane-help">Newest memes appear first with live vote updates.</p>
-      </div>
+    <section className="feed-section">
       {sorted.length === 0 ? (
-        <p className="pane-help">No memes posted yet.</p>
+        <div className="empty-feed">
+          <svg
+            className="empty-feed-icon"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <h3 className="empty-feed-title">No memes yet</h3>
+          <p className="empty-feed-text">Be the first to create and share a meme!</p>
+          <Link href="/" className="empty-feed-cta">
+            Create Your First Meme
+          </Link>
+        </div>
       ) : (
         <div className="feed-list">
           {sorted.map((meme) => {

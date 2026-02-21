@@ -24,6 +24,7 @@ type TextBlock = {
   y: number;
   fontSize: number;
   textColor: string;
+  strokeWidth: number;
 };
 
 type MemeEditorProps = {
@@ -139,12 +140,14 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
     const lineHeight = block.fontSize * LINE_HEIGHT_RATIO;
     const totalHeight = lines.length * lineHeight;
     let y = block.y - totalHeight / 2 + lineHeight / 2;
-    const lineWidth = Math.max(2, block.fontSize / STROKE_RATIO);
+    const lineWidth = block.strokeWidth ?? Math.max(2, block.fontSize / STROKE_RATIO);
     ctx.strokeStyle = "black";
     ctx.lineWidth = lineWidth;
     ctx.fillStyle = block.textColor || "#ffffff";
     lines.forEach((line) => {
-      ctx.strokeText(line, block.x, y);
+      if (lineWidth > 0) {
+        ctx.strokeText(line, block.x, y);
+      }
       ctx.fillText(line, block.x, y);
       y += lineHeight;
     });
@@ -268,7 +271,8 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
       x: canvasSize.width / 2,
       y: canvasSize.height / 2,
       fontSize: DEFAULT_FONT_SIZE,
-      textColor: "#ffffff"
+      textColor: "#ffffff",
+      strokeWidth: 4
     };
   }
 
@@ -288,6 +292,15 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
     if (dragRef.current.blockId === id) {
       dragRef.current.blockId = null;
     }
+  }
+
+  function updateSelectedBlock(updates: Partial<TextBlock>) {
+    if (selectedBlockId === null) return;
+    setBlocks((prev) =>
+      prev.map((block) =>
+        block.id === selectedBlockId ? { ...block, ...updates } : block
+      )
+    );
   }
 
   async function loadImage(src: string | File) {
@@ -362,27 +375,8 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
 
   return (
     <main className="workspace">
-      <aside className="left-pane card" aria-label="Template selector">
-        <h2 className="panel-title">Meme templates</h2>
-        <label className="file-label full-width" htmlFor="imageInput">
-          <span className="file-label-icon" aria-hidden="true">
-            ↑
-          </span>
-          <span className="file-label-text">Upload your own image</span>
-        </label>
-        <input
-          type="file"
-          id="imageInput"
-          accept="image/*"
-          hidden
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            await loadImage(file);
-            setSelectedTemplatePath("");
-          }}
-        />
-        <p className="pane-help">Or choose a ready-made template below:</p>
+      <aside className="templates-sidebar" aria-label="Template selector">
+        <h2 className="sidebar-title">TEMPLATES</h2>
         <div className="template-thumbs" aria-label="Template images">
           {TEMPLATES.map((template) => (
             <button
@@ -397,117 +391,173 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={template.path} alt={template.name} />
-              <span className="template-name">{template.name}</span>
             </button>
           ))}
         </div>
+        <label className="upload-btn" htmlFor="imageInput">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Upload</span>
+        </label>
+        <input
+          type="file"
+          id="imageInput"
+          accept="image/*"
+          hidden
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            await loadImage(file);
+            setSelectedTemplatePath("");
+          }}
+        />
       </aside>
 
-      <section className="center-pane">
-        <div className="canvas-card card">
-          <div className="canvas-toolbar">
-            <p className="canvas-title">Workspace</p>
-            <div className="toolbar-buttons">
-              <button type="button" className="secondary-btn" onClick={downloadMeme} disabled={!hasImage}>
-                Download meme
-              </button>
-              <button type="button" className="add-block-btn" onClick={handlePostMeme} disabled={!hasImage || !canPost || isPosting}>
-                {isPosting ? "Posting..." : "Post meme"}
-              </button>
+      <section className="canvas-area">
+        <div className="canvas-wrap">
+          <canvas ref={canvasRef} id="memeCanvas" aria-label="Meme preview" />
+          {!hasImage && (
+            <div className="canvas-placeholder">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              <p>Select a template or upload an image</p>
             </div>
-          </div>
-          <div className="canvas-wrap">
-            <canvas ref={canvasRef} id="memeCanvas" aria-label="Meme preview" />
-            {!hasImage && <p className="no-image-hint">Upload an image or select a template to begin</p>}
-          </div>
-        </div>
-
-        <div className="text-adder card" hidden={!hasImage}>
-          <div className="text-adder-content">
-            <div>
-              <p className="text-adder-title">Text tools</p>
-              <p className="text-adder-help">Add draggable text blocks and style them from the right panel.</p>
-            </div>
-            <button type="button" className="add-block-btn" onClick={addBlock}>
-              + Add text block
-            </button>
-          </div>
-          <div className="caption-input-wrap">
-            <label htmlFor="captionInput">Caption for feed</label>
-            <input
-              id="captionInput"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Optional caption"
-              maxLength={140}
-            />
-          </div>
+          )}
         </div>
       </section>
 
-      <aside className="right-pane card" aria-label="Text block editor" hidden={blocks.length === 0}>
-        <h2 className="panel-title">Text blocks</h2>
-        <p className="pane-help">Select a block to edit content, size, and color.</p>
-        <div className="blocks-list">
-          {blocks.map((block) => (
-            <div
-              key={block.id}
-              className={`block-row ${selectedBlock?.id === block.id ? "selected" : ""}`}
-              onClick={() => setSelectedBlockId(block.id)}
-              onFocus={() => setSelectedBlockId(block.id)}
-            >
-              <label>Text</label>
-              <textarea
-                className="block-text"
-                rows={2}
-                placeholder="Enter text (press Enter for new line)"
-                value={block.text}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setBlocks((prev) =>
-                    prev.map((item) => (item.id === block.id ? { ...item, text: value } : item))
-                  );
-                }}
-              />
-              <label>Size (px)</label>
-              <div className="size-row">
-                <input
-                  type="range"
-                  className="block-size"
-                  min={FONT_MIN}
-                  max={FONT_MAX}
-                  value={block.fontSize}
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    setBlocks((prev) =>
-                      prev.map((item) => (item.id === block.id ? { ...item, fontSize: value } : item))
-                    );
-                  }}
-                />
-                <span className="size-value">{block.fontSize}</span>
-              </div>
-              <label>Text color</label>
-              <div className="color-row">
-                <input
-                  type="color"
-                  className="block-color"
-                  value={block.textColor}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setBlocks((prev) =>
-                      prev.map((item) => (item.id === block.id ? { ...item, textColor: value } : item))
-                    );
-                  }}
-                />
-                <span className="color-value">{block.textColor}</span>
-              </div>
-              <button type="button" className="delete-block" onClick={() => removeBlock(block.id)}>
-                Remove
-              </button>
-            </div>
-          ))}
+      <footer className="bottom-toolbar">
+        <div className="toolbar-section edit-text-section">
+          <label className="toolbar-label">EDIT TEXT</label>
+          <textarea
+            className="toolbar-textarea"
+            rows={2}
+            placeholder={selectedBlock ? "Enter text..." : "Select a text box"}
+            value={selectedBlock?.text ?? ""}
+            disabled={!selectedBlock}
+            onChange={(e) => updateSelectedBlock({ text: e.target.value })}
+          />
         </div>
-      </aside>
+
+        <div className="toolbar-section size-section">
+          <label className="toolbar-label">SIZE</label>
+          <div className="toolbar-control">
+            <input
+              type="range"
+              className="toolbar-slider"
+              min={FONT_MIN}
+              max={FONT_MAX}
+              value={selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}
+              disabled={!selectedBlock}
+              onChange={(e) => updateSelectedBlock({ fontSize: Number(e.target.value) })}
+            />
+            <span className="toolbar-value">{selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}</span>
+          </div>
+        </div>
+
+        <div className="toolbar-section text-color-section">
+          <label className="toolbar-label">TEXT</label>
+          <input
+            type="color"
+            className="toolbar-color"
+            value={selectedBlock?.textColor ?? "#ffffff"}
+            disabled={!selectedBlock}
+            onChange={(e) => updateSelectedBlock({ textColor: e.target.value })}
+          />
+        </div>
+
+        <div className="toolbar-section border-section">
+          <label className="toolbar-label">BORDER</label>
+          <div className="toolbar-control">
+            <input
+              type="range"
+              className="toolbar-slider toolbar-slider-sm"
+              min={0}
+              max={12}
+              value={selectedBlock?.strokeWidth ?? 4}
+              disabled={!selectedBlock}
+              onChange={(e) => updateSelectedBlock({ strokeWidth: Number(e.target.value) })}
+            />
+            <span className="toolbar-value">{selectedBlock?.strokeWidth ?? 4}</span>
+          </div>
+        </div>
+
+        <div className="toolbar-section textboxes-section">
+          <label className="toolbar-label">TEXT BOXES</label>
+          <div className="textboxes-row">
+            <button
+              type="button"
+              className="add-textbox-btn"
+              onClick={addBlock}
+              disabled={!hasImage}
+            >
+              Add Text Box
+            </button>
+            {blocks.map((block) => (
+              <button
+                key={block.id}
+                type="button"
+                className={`textbox-chip ${selectedBlockId === block.id ? "active" : ""}`}
+                onClick={() => setSelectedBlockId(block.id)}
+              >
+                {block.text.slice(0, 8) || `Text ${block.id}`}
+                <span
+                  className="chip-remove"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeBlock(block.id);
+                  }}
+                >
+                  ×
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="toolbar-actions">
+          <button
+            type="button"
+            className="action-btn secondary"
+            onClick={downloadMeme}
+            disabled={!hasImage}
+          >
+            Download
+          </button>
+          <button
+            type="button"
+            className="action-btn primary"
+            onClick={handlePostMeme}
+            disabled={!hasImage || !canPost || isPosting}
+          >
+            {isPosting ? "Posting..." : "Post to Feed"}
+          </button>
+        </div>
+      </footer>
     </main>
   );
 }
