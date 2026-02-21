@@ -72,7 +72,7 @@ export function MemeFeed({ memes, votes, currentUserId }: MemeFeedProps) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="feed-image"
-                  src={meme.imageUrl || "/templates/two-buttons.jpg"}
+                  src={meme.imageUrl}
                   alt={meme.caption || "Posted meme"}
                 />
                 <div className="feed-meta">

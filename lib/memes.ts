@@ -70,7 +70,9 @@ export async function toggleVote(params: {
 }
 
 export function toSortedFeed(memes: MemeRecord[]): MemeRecord[] {
-  return [...memes].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+  return [...memes]
+    .filter((meme) => !!meme.imageUrl)
+    .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
 }
 
 export function getVoteCountMap(votes: VoteRecord[]): Record<string, number> {

@@ -11,14 +11,26 @@ export async function uploadMemeBlob(blob: Blob, userId: string): Promise<Upload
   const extension = blob.type === "image/jpeg" ? "jpg" : "png";
   const path = `memes/${userId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
-  const uploadResult = (await db.storage.uploadFile(path, blob, {
+  const uploadResult = await db.storage.uploadFile(path, blob, {
     contentType: blob.type || "image/png",
     contentDisposition: "inline"
-  })) as { path?: string; url?: string } | undefined;
+  });
+
+  const fileId = uploadResult?.data?.id;
+  if (!fileId) {
+    throw new Error("Upload failed: no file ID returned");
+  }
+
+  const filesQuery = await db.queryOnce({ $files: { $: { where: { id: fileId } } } });
+  const fileRecord = filesQuery.data?.$files?.[0];
+
+  if (!fileRecord?.url) {
+    throw new Error("Upload succeeded but could not retrieve file URL");
+  }
 
   return {
-    path: uploadResult?.path ?? path,
-    url: uploadResult?.url ?? ""
+    path: fileRecord.path ?? path,
+    url: fileRecord.url
   };
 }
 
