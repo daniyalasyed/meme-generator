@@ -376,7 +376,7 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
   return (
     <main className="workspace">
       <aside className="templates-sidebar" aria-label="Template selector">
-        <h2 className="sidebar-title">TEMPLATES</h2>
+        <h2 className="sidebar-title">Choose a template</h2>
         <div className="template-thumbs" aria-label="Template images">
           {TEMPLATES.map((template) => (
             <button
@@ -409,7 +409,7 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          <span>Upload</span>
+          <span>or upload your own template</span>
         </label>
         <input
           type="file"
@@ -450,114 +450,130 @@ export function MemeEditor({ canPost, isPosting, onPost }: MemeEditorProps) {
         </div>
       </section>
 
-      <footer className="bottom-toolbar">
-        <div className="toolbar-section edit-text-section">
-          <label className="toolbar-label">EDIT TEXT</label>
-          <textarea
-            className="toolbar-textarea"
-            rows={2}
-            placeholder={selectedBlock ? "Enter text..." : "Select a text box"}
-            value={selectedBlock?.text ?? ""}
-            disabled={!selectedBlock}
-            onChange={(e) => updateSelectedBlock({ text: e.target.value })}
-          />
+      {hasImage && blocks.length === 0 && (
+        <div className="add-textbox-prompt">
+          <button type="button" className="add-textbox-btn" onClick={addBlock}>
+            Add Text Box
+          </button>
         </div>
+      )}
 
-        <div className="toolbar-section size-section">
-          <label className="toolbar-label">SIZE</label>
-          <div className="toolbar-control">
-            <input
-              type="range"
-              className="toolbar-slider"
-              min={FONT_MIN}
-              max={FONT_MAX}
-              value={selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}
+      {hasImage && blocks.length > 0 && (
+        <footer className="bottom-toolbar">
+          <div className="toolbar-section edit-text-section">
+            <label className="toolbar-label">EDIT TEXT</label>
+            <textarea
+              className="toolbar-textarea"
+              rows={2}
+              placeholder={selectedBlock ? "Enter text..." : "Select a text box"}
+              value={selectedBlock?.text ?? ""}
               disabled={!selectedBlock}
-              onChange={(e) => updateSelectedBlock({ fontSize: Number(e.target.value) })}
+              onChange={(e) => updateSelectedBlock({ text: e.target.value })}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (selectedBlock?.text.trim()) {
+                    addBlock();
+                  }
+                }
+              }}
             />
-            <span className="toolbar-value">{selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}</span>
           </div>
-        </div>
 
-        <div className="toolbar-section text-color-section">
-          <label className="toolbar-label">TEXT</label>
-          <input
-            type="color"
-            className="toolbar-color"
-            value={selectedBlock?.textColor ?? "#ffffff"}
-            disabled={!selectedBlock}
-            onChange={(e) => updateSelectedBlock({ textColor: e.target.value })}
-          />
-        </div>
+          <div className="toolbar-section size-section">
+            <label className="toolbar-label">SIZE</label>
+            <div className="toolbar-control">
+              <input
+                type="range"
+                className="toolbar-slider"
+                min={FONT_MIN}
+                max={FONT_MAX}
+                value={selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}
+                disabled={!selectedBlock}
+                onChange={(e) => updateSelectedBlock({ fontSize: Number(e.target.value) })}
+              />
+              <span className="toolbar-value">{selectedBlock?.fontSize ?? DEFAULT_FONT_SIZE}</span>
+            </div>
+          </div>
 
-        <div className="toolbar-section border-section">
-          <label className="toolbar-label">BORDER</label>
-          <div className="toolbar-control">
+          <div className="toolbar-section text-color-section">
+            <label className="toolbar-label">TEXT</label>
             <input
-              type="range"
-              className="toolbar-slider toolbar-slider-sm"
-              min={0}
-              max={12}
-              value={selectedBlock?.strokeWidth ?? 4}
+              type="color"
+              className="toolbar-color"
+              value={selectedBlock?.textColor ?? "#ffffff"}
               disabled={!selectedBlock}
-              onChange={(e) => updateSelectedBlock({ strokeWidth: Number(e.target.value) })}
+              onChange={(e) => updateSelectedBlock({ textColor: e.target.value })}
             />
-            <span className="toolbar-value">{selectedBlock?.strokeWidth ?? 4}</span>
           </div>
-        </div>
 
-        <div className="toolbar-section textboxes-section">
-          <label className="toolbar-label">TEXT BOXES</label>
-          <div className="textboxes-row">
+          <div className="toolbar-section border-section">
+            <label className="toolbar-label">BORDER</label>
+            <div className="toolbar-control">
+              <input
+                type="range"
+                className="toolbar-slider toolbar-slider-sm"
+                min={0}
+                max={12}
+                value={selectedBlock?.strokeWidth ?? 4}
+                disabled={!selectedBlock}
+                onChange={(e) => updateSelectedBlock({ strokeWidth: Number(e.target.value) })}
+              />
+              <span className="toolbar-value">{selectedBlock?.strokeWidth ?? 4}</span>
+            </div>
+          </div>
+
+          <div className="toolbar-section textboxes-section">
+            <label className="toolbar-label">TEXT BOXES</label>
+            <div className="textboxes-row">
+              <button
+                type="button"
+                className="add-textbox-btn"
+                onClick={addBlock}
+              >
+                Add Text Box
+              </button>
+              {blocks.map((block) => (
+                <button
+                  key={block.id}
+                  type="button"
+                  className={`textbox-chip ${selectedBlockId === block.id ? "active" : ""}`}
+                  onClick={() => setSelectedBlockId(block.id)}
+                >
+                  {block.text.slice(0, 8) || `Text ${block.id}`}
+                  <span
+                    className="chip-remove"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeBlock(block.id);
+                    }}
+                  >
+                    ×
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="toolbar-actions">
             <button
               type="button"
-              className="add-textbox-btn"
-              onClick={addBlock}
-              disabled={!hasImage}
+              className="action-btn secondary"
+              onClick={downloadMeme}
             >
-              Add Text Box
+              Download
             </button>
-            {blocks.map((block) => (
-              <button
-                key={block.id}
-                type="button"
-                className={`textbox-chip ${selectedBlockId === block.id ? "active" : ""}`}
-                onClick={() => setSelectedBlockId(block.id)}
-              >
-                {block.text.slice(0, 8) || `Text ${block.id}`}
-                <span
-                  className="chip-remove"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeBlock(block.id);
-                  }}
-                >
-                  ×
-                </span>
-              </button>
-            ))}
+            <button
+              type="button"
+              className="action-btn primary"
+              onClick={handlePostMeme}
+              disabled={!canPost || isPosting}
+            >
+              {isPosting ? "Posting..." : "Post to Feed"}
+            </button>
           </div>
-        </div>
-
-        <div className="toolbar-actions">
-          <button
-            type="button"
-            className="action-btn secondary"
-            onClick={downloadMeme}
-            disabled={!hasImage}
-          >
-            Download
-          </button>
-          <button
-            type="button"
-            className="action-btn primary"
-            onClick={handlePostMeme}
-            disabled={!hasImage || !canPost || isPosting}
-          >
-            {isPosting ? "Posting..." : "Post to Feed"}
-          </button>
-        </div>
-      </footer>
+        </footer>
+      )}
     </main>
   );
 }

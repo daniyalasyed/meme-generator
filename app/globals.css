@@ -415,6 +415,12 @@ a {
   cursor: not-allowed;
 }
 
+.add-textbox-prompt {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
+
 .textbox-chip {
   display: inline-flex;
   align-items: center;
