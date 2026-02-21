@@ -12,10 +12,6 @@ export default function FeedPage() {
 
   return (
     <div className="app feed-page">
-      <div className="feed-page-header">
-        <h1 className="feed-page-title">Meme Feed</h1>
-      </div>
-
       {isLoading ? (
         <section className="card feed-card">
           <p className="pane-help">Loading feed...</p>
