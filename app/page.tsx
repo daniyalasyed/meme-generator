@@ -54,7 +54,7 @@ export default function HomePage() {
     }
 
     try {
-      await assertRateLimit("post", user.id);
+      await assertRateLimit("post", user.refresh_token);
       setIsPosting(true);
       const upload = await uploadMemeBlob(params.blob, user.id);
       await createMeme({

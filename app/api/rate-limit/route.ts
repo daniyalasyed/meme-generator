@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminDb } from "@/lib/instant-admin";
 
 type LimitAction = "post" | "vote";
 type BucketMap = Map<string, number[]>;
@@ -16,14 +17,32 @@ const bucket: BucketMap = globalForRateLimit.__memeRateBucket ?? new Map<string,
 globalForRateLimit.__memeRateBucket = bucket;
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as { action?: LimitAction; userId?: string };
+  const body = (await req.json()) as { action?: LimitAction; token?: string };
   const action = body.action;
-  const userId = body.userId?.trim();
+  const token = body.token?.trim();
 
-  if (!action || !LIMITS[action] || !userId) {
+  if (!action || !LIMITS[action] || !token) {
     return NextResponse.json(
       { allowed: false, message: "Invalid rate-limit request payload." },
       { status: 400 }
+    );
+  }
+
+  // Verify the token server-side to get the real user ID
+  let userId: string;
+  try {
+    const user = await adminDb.auth.verifyToken(token);
+    if (!user) {
+      return NextResponse.json(
+        { allowed: false, message: "Invalid authentication token." },
+        { status: 401 }
+      );
+    }
+    userId = user.id;
+  } catch {
+    return NextResponse.json(
+      { allowed: false, message: "Failed to verify authentication." },
+      { status: 401 }
     );
   }
 

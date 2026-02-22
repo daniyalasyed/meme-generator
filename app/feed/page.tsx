@@ -21,7 +21,7 @@ export default function FeedPage() {
           <p className="pane-help">{error.message || "Failed to load feed."}</p>
         </section>
       ) : (
-        <MemeFeed memes={memes} votes={votes} currentUserId={user?.id} />
+        <MemeFeed memes={memes} votes={votes} currentUserId={user?.id} currentUserToken={user?.refresh_token} />
       )}
     </div>
   );

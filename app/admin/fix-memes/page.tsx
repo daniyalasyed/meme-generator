@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { db } from "@/lib/instant";
+import { isAdmin } from "@/lib/templates";
 
 type MemeRecord = {
   id: string;
@@ -18,9 +20,25 @@ type FileRecord = {
 };
 
 export default function FixMemesPage() {
+  const router = useRouter();
+  const { isLoading: authLoading, user } = db.useAuth();
+
   const [status, setStatus] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
   const [results, setResults] = useState<{ fixed: string[]; notFound: string[]; alreadyOk: string[] } | null>(null);
+
+  if (authLoading) {
+    return (
+      <div className="app" style={{ padding: "2rem", textAlign: "center" }}>
+        <p style={{ color: "var(--text-muted)" }}>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin(user.email)) {
+    router.push("/");
+    return null;
+  }
 
   async function runMigration() {
     setIsRunning(true);

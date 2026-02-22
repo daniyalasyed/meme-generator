@@ -9,21 +9,22 @@ type MemeFeedProps = {
   memes: MemeRecord[];
   votes: VoteRecord[];
   currentUserId?: string;
+  currentUserToken?: string;
 };
 
-export function MemeFeed({ memes, votes, currentUserId }: MemeFeedProps) {
+export function MemeFeed({ memes, votes, currentUserId, currentUserToken }: MemeFeedProps) {
   const [busyMemeId, setBusyMemeId] = useState<string | null>(null);
   const voteCountMap = useMemo(() => getVoteCountMap(votes), [votes]);
   const userVotes = useMemo(() => getUserVoteSet(votes, currentUserId), [votes, currentUserId]);
   const sorted = useMemo(() => toSortedFeed(memes), [memes]);
 
   async function handleVote(memeId: string) {
-    if (!currentUserId) {
+    if (!currentUserId || !currentUserToken) {
       return;
     }
     setBusyMemeId(memeId);
     try {
-      await assertRateLimit("vote", currentUserId);
+      await assertRateLimit("vote", currentUserToken);
       await toggleVote({
         memeId,
         userId: currentUserId,

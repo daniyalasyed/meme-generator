@@ -8,6 +8,10 @@ desktop.ini
 *.swo
 *~
 
+# Cursor IDE debug logs (may contain sensitive tokens)
+.cursor/debug-*.log
+.cursor/*.log
+
 # Logs
 *.log
 npm-debug.log*

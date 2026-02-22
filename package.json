@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@instantdb/admin": "^0.22.142",
     "@instantdb/react": "^0.19.4",
     "@vercel/analytics": "^1.6.1",
     "next": "^15.1.7",

@@ -1,12 +1,15 @@
 "use client";
 
-export async function assertRateLimit(action: "post" | "vote", userId: string): Promise<void> {
+export async function assertRateLimit(
+  action: "post" | "vote",
+  refreshToken: string
+): Promise<void> {
   const res = await fetch("/api/rate-limit", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ action, userId })
+    body: JSON.stringify({ action, token: refreshToken })
   });
 
   if (res.ok) return;
